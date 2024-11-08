@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="dark-theme">
+    <header>
+        <nav>
+            <div class="logo">User Dashboard</div>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="dashboard-content">
+            <h2>Welcome, {{ username }}!</h2>
+            <p>Explore our available products below.</p>
+
+            <!-- Search Form -->
+            <form action="{{ url_for('dashboard') }}" method="POST" class="search-form">
+                <input type="text" name="search" placeholder="Search products..." value="{{ search_query }}" required>
+                <button type="submit">Search</button>
+            </form>
+
+            <!-- Product Table -->
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if products %}
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product[1] }}</td>
+                            <td>{{ product[2] }}</td>
+                            <td>${{ product[3] }}</td>
+                            <td>{{ product[4] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No products found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      <div id="popup" class="popup {% for category, message in messages %}{{ category }}{% endfor %}">
+        {% for category, message in messages %}
+          {{ message }}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <script>
+      // Display flash message as popup
+      window.onload = function() {
+          const popup = document.getElementById('popup');
+          if (popup) {
+              popup.style.display = 'block';
+              setTimeout(() => { popup.style.display = 'none'; }, 3000); // Hide after 3 seconds
+          }
+      };
+  </script>
+
+  {% block content %}{% endblock %}
+
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; Nakul V (2303737724421021)</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if product %}Edit Product{% else %}Add New Product{% endif %}</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2e2e3e, #1e1e2f);
+            color: #f5f5f7;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header and Navigation */
+        header {
+            background-color: #252542;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #70a1ff;
+            transform: rotateY(0deg);
+            animation: logoHover 10s infinite alternate ease-in-out;
+        }
+
+       
+
+        header ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        header ul li a:hover {
+            color: #70a1ff;
+            transform: translateZ(10px) scale(1.1);
+        }
+
+        /* Form Section with 3D Effects */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 2rem auto;
+            background-color: #2e2e3e;
+            border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+            transition: transform 0.5s ease;
+        }
+
+        .form-section:hover {
+            transform: translateZ(20px);
+        }
+
+        .form-section h2 {
+            font-size: 2.5rem;
+            color: #70a1ff;
+            margin-bottom: 1.5rem;
+            animation: titleSlide 1.5s ease forwards;
+        }
+
+        .form-section form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            perspective: 500px;
+        }
+
+        .form-section input,
+        .form-section textarea {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #2c2c3e;
+            color: #fff;
+            transform: translateZ(5px);
+            transition: transform 0.3s;
+        }
+
+        .form-section input:focus,
+        .form-section textarea:focus {
+            transform: translateZ(10px) scale(1.05);
+            outline: none;
+            box-shadow: 0px 0px 8px #70a1ff;
+        }
+
+        .cta-button {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 4px;
+            background-color: #70a1ff;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+            transform: translateZ(10px);
+            box-shadow: 0px 4px 10px rgba(112, 161, 255, 0.5);
+        }
+
+        .cta-button:hover {
+            background-color: #5680e9;
+            transform: translateZ(20px) scale(1.05) rotateY(10deg);
+        }
+
+        /* Footer with Floating Effect */
+        footer {
+            background-color: #252542;
+            text-align: center;
+            padding: 1rem;
+            color: #888;
+            font-size: 0.875rem;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            transform: translateZ(10px);
+            animation: floatingFooter 6s infinite ease-in-out;
+        }
+
+        /* Keyframe Animations */
+        @keyframes titleSlide {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes logoHover {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        @keyframes floatingFooter {
+            0%, 100% { transform: translateY(0) translateZ(10px); }
+            50% { transform: translateY(-5px) translateZ(10px); }
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            opacity: 0.9;
+        }
+        .popup.success { background-color: green; }
+        .popup.error { background-color: red; }
+
+    </style>
+</head>
+<body class="dark-theme">
+    <header>
+
+        <nav>
+            <div class="logo">Admin Panel</div>
+            <ul>
+                <li><a href="{{ url_for('admin') }}">Admin Home</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      <div id="popup" class="popup {% for category, message in messages %}{{ category }}{% endfor %}">
+        {% for category, message in messages %}
+          {{ message }}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <script>
+      // Display flash message as popup
+      window.onload = function() {
+          const popup = document.getElementById('popup');
+          if (popup) {
+              popup.style.display = 'block';
+              setTimeout(() => { popup.style.display = 'none'; }, 3000); // Hide after 3 seconds
+          }
+      };
+  </script>
+
+  {% block content %}{% endblock %}
+
+        <section class="form-section">
+            <h2>{% if product %}Edit Product{% else %}Add New Product{% endif %}</h2>
+            <form method="POST">
+                <input type="text" name="name" placeholder="Product Name" value="{{ product[1] if product else '' }}" required>
+                <textarea name="description" placeholder="Product Description" required>{{ product[2] if product else '' }}</textarea>
+                <input type="number" name="price" placeholder="Price" value="{{ product[3] if product else '' }}" required>
+                <input type="number" name="stock" placeholder="Stock" value="{{ product[4] if product else '' }}" required>
+                <button type="submit" class="cta-button">{% if product %}Update Product{% else %}Add Product{% endif %}</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; Nakul V (2303737724421021)</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eCommerce Home</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #3b3b5c);
+            color: #f5f5f7;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* Header and Navigation */
+        header {
+            background-color: #252542;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+            transition: background 0.3s ease;
+        }
+
+        header .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #70a1ff;
+            text-transform: uppercase;
+            animation: logoAnimation 5s infinite alternate ease-in-out;
+        }
+
+        /* Navigation alignment to the right */
+        header ul {
+            list-style-type: none;
+            display: flex;
+            gap: 1.5rem;
+            margin-left: auto; /* Align to the right */
+        }
+
+        header ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        header ul li a:hover {
+            color: #70a1ff;
+            transform: scale(1.1) translateZ(10px);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            margin: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            animation: heroEffect 2s ease-in-out;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: #70a1ff;
+            margin-bottom: 1rem;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .cta-button {
+            background-color: #70a1ff;
+            color: #fff;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            display: inline-block;
+            box-shadow: 0px 4px 10px rgba(112, 161, 255, 0.5);
+            transform: translateZ(10px);
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: #5680e9;
+            transform: translateZ(20px) scale(1.05) rotateY(10deg);
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #252542;
+            text-align: center;
+            padding: 1rem;
+            color: #888;
+            font-size: 0.875rem;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            animation: floatingFooter 6s infinite ease-in-out;
+        }
+
+        /* Keyframe Animations */
+        @keyframes logoAnimation {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes heroEffect {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes floatingFooter {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            opacity: 0.9;
+        }
+        .popup.success { background-color: green; }
+        .popup.error { background-color: red; }
+
+    </style>
+</head>
+<body class="dark-theme">
+    <header>
+        <nav>
+            <div class="logo">eCommerce</div>
+            <ul>
+                <li><a href="/">Home</a></li>
+                {% if 'loggedin' not in session %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% elif session['role'] == 'user' %}
+                    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% elif session['role'] == 'admin' %}
+                    <li><a href="{{ url_for('admin') }}">Admin Panel</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      <div id="popup" class="popup {% for category, message in messages %}{{ category }}{% endfor %}">
+        {% for category, message in messages %}
+          {{ message }}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <script>
+      // Display flash message as popup
+      window.onload = function() {
+          const popup = document.getElementById('popup');
+          if (popup) {
+              popup.style.display = 'block';
+              setTimeout(() => { popup.style.display = 'none'; }, 3000); // Hide after 3 seconds
+          }
+      };
+  </script>
+
+  {% block content %}{% endblock %}
+
+        <section class="hero">
+            <h1>Welcome to Our eCommerce Platform</h1>
+            <p>Discover the best products, manage your dashboard, and more.</p>
+            {% if 'loggedin' not in session %}
+                <a href="{{ url_for('register') }}" class="cta-button">Get Started</a>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; Nakul V (2303737724421021)</p>
+    </footer>
+</body>
+</html>
